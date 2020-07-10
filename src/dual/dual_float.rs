@@ -131,11 +131,18 @@ impl<T: Float> Float for Dual<T> {
         }
     }
 
-    /// Computes the absolute value of `self`. Returns `Float::nan()` if the
+    /// Computes the absolute value of `self`.
     fn abs(self) -> Self {
+        let eps = if self.val > T::zero() {
+            T::one()
+        } else if self.val < T::zero() {
+            -T::one()
+        } else {
+            T::nan()
+        };
         Dual {
             val: self.val.abs(),
-            eps: T::zero(),
+            eps,
         }
     }
 
@@ -143,7 +150,11 @@ impl<T: Float> Float for Dual<T> {
     fn signum(self) -> Self {
         Dual {
             val: self.val.signum(),
-            eps: T::zero(),
+            eps: if self.val == T::zero() {
+                T::nan()
+            } else {
+                T::zero()
+            },
         }
     }
 
